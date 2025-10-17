@@ -28,6 +28,15 @@ return [
 
     'env' => env('APP_ENV', 'production'),
 
+    'auth_service_url' => env('AUTH_SERVICE_URL'),
+
+    'product_service_url' => env('PRODUCT_SERVICE_URL'),
+    
+    'order_service_url' => env('ORDER_SERVICE_URL'),
+
+    
+    
+
     /*
     |--------------------------------------------------------------------------
     | Application Debug Mode
