@@ -2,3 +2,9 @@ gateway = call port for service and pass the data
 auth-service = login, register, user, users, authUser
 order-service = view who order of the products
 product-service = display product and can add to cart
+
+
+ADD PRODUCT => 
+EDIT PRODUCT => 
+DELETE_PRODUCT =>
+    
