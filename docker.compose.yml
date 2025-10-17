@@ -1,0 +1,112 @@
+version: "3.9"
+
+services:
+  # === FRONTEND ===
+  react-frontend:
+    build: ./react-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - gateway
+
+  # === GATEWAY ===
+  gateway:
+    build: ./gateway
+    ports:
+      - "8000:8000"
+    environment:
+      - AUTH_SERVICE_URL=http://auth-service:8001
+      - PRODUCT_SERVICE_URL=http://product-service:8002
+      - ORDER_SERVICE_URL=http://order-service:8003
+    depends_on:
+      - auth-service
+      - product-service
+      - order-service
+
+  # === AUTH SERVICE ===
+  auth-service:
+    build: ./auth-service
+    ports:
+      - "8001:8001"
+    environment:
+      - DB_CONNECTION=mysql
+      - DB_HOST=auth-db
+      - DB_PORT=3306
+      - DB_DATABASE=auth_db
+      - DB_USERNAME=root
+      - DB_PASSWORD=root
+    depends_on:
+      - auth-db
+
+  auth-db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: auth_db
+    ports:
+      - "3307:3306"   # local port 3307 -> container 3306
+    volumes:
+      - auth_data:/var/lib/mysql
+
+  # === PRODUCT SERVICE ===
+  product-service:
+    build: ./product-service
+    ports:
+      - "8002:8002"
+    environment:
+      - DB_CONNECTION=mysql
+      - DB_HOST=product-db
+      - DB_PORT=3306
+      - DB_DATABASE=product_db
+      - DB_USERNAME=root
+      - DB_PASSWORD=root
+    depends_on:
+      - product-db
+
+  product-db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: product_db
+    ports:
+      - "3308:3306"
+    volumes:
+      - product_data:/var/lib/mysql
+
+  # === ORDER SERVICE ===
+  order-service:
+    build: ./order-service
+    ports:
+      - "8003:8003"
+    environment:
+      - DB_CONNECTION=mysql
+      - DB_HOST=order-db
+      - DB_PORT=3306
+      - DB_DATABASE=order_db
+      - DB_USERNAME=root
+      - DB_PASSWORD=root
+    depends_on:
+      - order-db
+
+  order-db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: order_db
+    ports:
+      - "3309:3306"
+    volumes:
+      - order_data:/var/lib/mysql
+
+# === VOLUMES ===
+volumes:
+  auth_data:
+  product_data:
+  order_data:
+
+networks:
+  default:
+    name: microservice-net
