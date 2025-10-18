@@ -10,7 +10,7 @@ class ProductController extends Controller
 
     public function showProductList()
     {
-        $response = Http::get('http://localhost:8002/api/get-products');
+        $response = Http::get(config('app.product_service_url') . 'api/get-products');
         return response()->json($response->json());
     }
     public function showUserOrder(Request $request)
@@ -22,7 +22,7 @@ class ProductController extends Controller
 
     public function storeProduct(Request $request)
     {
-        $response = Http::post('http://localhost:8002/api/store-product', $request->all());
+        $response = Http::post(config('app.product_service_url') .'api/store-product', $request->all());
         return response()->json($response->json());
     }
 }
