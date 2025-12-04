@@ -10,8 +10,9 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     libxml2-dev \
     libonig-dev \
-    && docker-php-ext-install zip pdo pdo_mysql mbstring xml tokenizer ctype \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+&& docker-php-ext-install zip pdo pdo_mysql mbstring xml tokenizer ctype \
+&& apt-get clean \
+&& rm -rf /var/lib/apt/lists/*
 
 # Install Composer
 COPY --from=composer:2.9 /usr/bin/composer /usr/bin/composer
