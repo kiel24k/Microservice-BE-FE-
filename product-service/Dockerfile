@@ -3,6 +3,7 @@ FROM php:8.3-cli
 WORKDIR /var/www
 
 # Install system dependencies + PHP extensions
+
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
@@ -12,8 +13,9 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     pkg-config \
     curl \
-    && docker-php-ext-install pdo_mysql mbstring zip xml tokenizer ctype \
+    && docker-php-ext-install pdo_mysql mbstring zip xml ctype \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
+
 
 # Install Composer 2.9
 COPY --from=composer:2.9 /usr/bin/composer /usr/bin/composer
