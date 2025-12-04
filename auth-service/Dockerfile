@@ -10,7 +10,7 @@ COPY --from=composer:2.9 /usr/bin/composer /usr/bin/composer
 
 # Copy composer files and install dependencies
 COPY composer.json composer.lock ./
-RUN composer install --no-interaction --prefer-dist --optimize-autoloader
+RUN composer install
 
 # Copy application
 COPY . .
