@@ -2,8 +2,7 @@ FROM php:8.3-cli
 
 WORKDIR /var/www
 
-# Install system dependencies + PHP extensions
-
+# Install system dependencies and PHP extensions
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
@@ -15,37 +14,42 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     libonig-dev \
     && update-ca-certificates \
-    && docker-php-ext-install pdo_mysql mbstring zip xml ctype \
+    && docker-php-ext-install \
+        pdo_mysql \
+        mbstring \
+        zip \
+        xml \
+        ctype \
+        tokenizer \
+        dom \
+        simplexml \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install Composer 2.9
+# Install Composer
 COPY --from=composer:2.9 /usr/bin/composer /usr/bin/composer
 
-# Copy composer files first for caching
-COPY composer.json composer.lock ./
-
-# Install PHP dependencies, ignoring platform differences
-RUN composer install --ignore-platform-reqs --no-interaction --prefer-dist --optimize-autoloader
-
-# Copy the rest of the application
+# Copy full application first
 COPY . .
 
-# Copy .env
+# Copy dotenv
 RUN cp .env.example .env
 
-# Set permissions
-RUN chown -R www-data:www-data /var/www \
-    && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
+# Install PHP dependencies
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 
-# Switch to www-data for artisan commands
+# Generate Laravel key BEFORE optimize
+RUN php artisan key:generate
+
+# Optimize (now it works)
+RUN php artisan optimize
+
+# Permissions
+RUN chown -R www-data:www-data /var/www \
+    && chmod -R 775 storage bootstrap/cache
+
+# Switch to non-root user
 USER www-data
 
-
-RUN php artisan optimize
-RUN php artisan migrate
-
-# Expose port
 EXPOSE 8002
 
-# Start Laravel dev server
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8002"]
