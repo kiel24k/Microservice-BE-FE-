@@ -34,7 +34,7 @@ COPY . .
 RUN cp .env.example .env
 
 # Install PHP dependencies
-RUN composer install --no-interaction --prefer-dist --optimize-autoloader
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader --ignore-platform-reqs
 RUN composer update
 
 # Generate Laravel key BEFORE optimize
