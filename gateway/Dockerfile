@@ -40,6 +40,9 @@ RUN chown -R www-data:www-data /var/www \
 # Switch to www-data for artisan commands
 USER www-data
 
+RUN php artisan optimize
+RUN php artisan migrate
+
 # Expose port
 EXPOSE 8000
 

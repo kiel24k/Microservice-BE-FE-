@@ -18,7 +18,6 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-install pdo_mysql mbstring zip xml ctype \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-
 # Install Composer 2.9
 COPY --from=composer:2.9 /usr/bin/composer /usr/bin/composer
 
@@ -40,6 +39,10 @@ RUN chown -R www-data:www-data /var/www \
 
 # Switch to www-data for artisan commands
 USER www-data
+
+
+RUN php artisan optimize
+RUN php artisan migrate
 
 # Expose port
 EXPOSE 8002
