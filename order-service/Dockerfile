@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y \
     git \
     libzip-dev \
     libxml2-dev \
+    libonig-dev \
     && docker-php-ext-install zip pdo pdo_mysql mbstring xml tokenizer ctype \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
@@ -18,6 +19,9 @@ COPY --from=composer:2.9 /usr/bin/composer /usr/bin/composer
 # Copy composer files first
 COPY composer.json composer.lock ./
 
+# Copy .env.example to .env
+RUN cp .env.example .env
+
 # Install Laravel dependencies
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 
@@ -26,7 +30,9 @@ COPY . .
 
 # Generate app key and run migrations
 RUN php artisan key:generate \
+    && php artisan optimize \
     && php artisan migrate --force
+   
 
 # Expose port for Laravel dev server
 EXPOSE 8001
