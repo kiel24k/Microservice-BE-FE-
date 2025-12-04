@@ -3,16 +3,28 @@ FROM php:8.3-cli
 WORKDIR /var/www
 
 # Install system dependencies + PHP extensions
-RUN apt-get update && apt-get install
+RUN apt-get update && apt-get install -y \
+    git \
+    unzip \
+    libzip-dev \
+    libxml2-dev \
+    libonig-dev \
+    build-essential \
+    pkg-config \
+    curl \
+    && docker-php-ext-install pdo_mysql mbstring zip xml tokenizer ctype \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install Composer
+# Install Composer 2.9
 COPY --from=composer:2.9 /usr/bin/composer /usr/bin/composer
 
-# Copy composer files and install dependencies
+# Copy composer files first for caching
 COPY composer.json composer.lock ./
-RUN composer install
 
-# Copy application
+# Install PHP dependencies, ignoring platform differences
+RUN composer install --ignore-platform-reqs --no-interaction --prefer-dist --optimize-autoloader
+
+# Copy the rest of the application
 COPY . .
 
 # Copy .env
@@ -22,7 +34,7 @@ RUN cp .env.example .env
 RUN chown -R www-data:www-data /var/www \
     && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
-# Switch to www-data user for artisan commands
+# Switch to www-data for artisan commands
 USER www-data
 
 # Expose port
