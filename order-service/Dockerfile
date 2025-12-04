@@ -1,7 +1,5 @@
-# Use PHP 8.3 CLI
 FROM php:8.3-cli
 
-# Set working directory
 WORKDIR /var/www
 
 # Install system dependencies + PHP extensions
@@ -11,34 +9,34 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     libxml2-dev \
     libonig-dev \
-    && docker-php-ext-install zip pdo pdo_mysql mbstring xml tokenizer ctype \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+    build-essential \
+    pkg-config \
+    curl \
+&& docker-php-ext-install pdo_mysql mbstring zip xml tokenizer ctype \
+&& apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install Composer (2.9)
+# Install Composer
 COPY --from=composer:2.9 /usr/bin/composer /usr/bin/composer
 
-# Copy composer files first for caching
+# Copy composer files and install dependencies
 COPY composer.json composer.lock ./
-
-# Install PHP dependencies
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 
-# Copy the rest of the application
+# Copy application
 COPY . .
 
-# Copy .env.example to .env
+# Copy .env
 RUN cp .env.example .env
 
-# Set proper permissions for Laravel
+# Set permissions
 RUN chown -R www-data:www-data /var/www \
     && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
-# Generate application key and run migrations
-RUN php artisan key:generate \
-    && php artisan migrate --force
+# Switch to www-data user for artisan commands
+USER www-data
 
-# Expose Laravel dev server port
-EXPOSE 8001
+# Expose port
+EXPOSE 8003
 
 # Start Laravel dev server
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8003"]
