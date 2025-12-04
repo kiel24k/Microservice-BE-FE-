@@ -40,10 +40,6 @@ RUN composer update
 # Generate Laravel key BEFORE optimize
 RUN php artisan key:generate
 
-# Optimize (now it works)
-RUN php artisan optimize
-
-RUN php artisan migrate
 
 # Permissions
 RUN chown -R www-data:www-data /var/www \
