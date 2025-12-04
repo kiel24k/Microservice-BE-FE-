@@ -20,7 +20,6 @@ RUN apt-get update && apt-get install -y \
         zip \
         xml \
         ctype \
-        tokenizer \
         dom \
         simplexml \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
