@@ -7,12 +7,14 @@ WORKDIR /var/www
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
+    curl \
+    wget \
+    ca-certificates \
+    gnupg \
     libzip-dev \
     libxml2-dev \
     libonig-dev \
-    build-essential \
-    pkg-config \
-    curl \
+    && update-ca-certificates \
     && docker-php-ext-install pdo_mysql mbstring zip xml ctype \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
